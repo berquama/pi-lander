@@ -103,39 +103,6 @@
 
     .spotify img { filter: drop-shadow(0 0 12px var(--accent-spotify)); }
     .proton img { filter: drop-shadow(0 0 12px var(--accent-proton)); }
-
-    #iframeOverlay {
-      position: fixed;
-      inset: 0;
-      background: #000;
-      display: none;
-      z-index: 9998;
-    }
-
-    #iframeOverlay iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    #backButton {
-      position: fixed;
-      top: 16px;
-      left: 16px;
-      background: rgba(18,24,32,0.7);
-      color: #e6edf3;
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 12px;
-      padding: 10px 18px;
-      font-weight: 600;
-      cursor: pointer;
-      z-index: 9999;
-      display: none;
-      backdrop-filter: blur(6px);
-      transition: background 0.2s ease;
-    }
-
-    #backButton:hover { background: rgba(30,40,50,0.8); }
   </style>
 </head>
 <body>
@@ -157,25 +124,17 @@
     </div>
   </main>
 
-  <div id="iframeOverlay"><iframe id="appFrame" src=""></iframe></div>
-  <button id="backButton" onclick="closeApp()">← Back</button>
-
   <script>
-    // Launch app in iframe overlay
-    function openApp(url) {
-      const iframeOverlay = document.getElementById('iframeOverlay');
-      const frame = document.getElementById('appFrame');
-      frame.src = url;
-      iframeOverlay.style.display = 'block';
-      document.getElementById('backButton').style.display = 'block';
-    }
+    // Open app in new window
+    let appWindow = null;
 
-    function closeApp() {
-      const iframeOverlay = document.getElementById('iframeOverlay');
-      const frame = document.getElementById('appFrame');
-      frame.src = '';
-      iframeOverlay.style.display = 'none';
-      document.getElementById('backButton').style.display = 'none';
+    function openApp(url) {
+      if (appWindow && !appWindow.closed) {
+        appWindow.focus();
+        appWindow.location.href = url;
+      } else {
+        appWindow = window.open(url, '_blank');
+      }
     }
 
     // Daily motivational quote
