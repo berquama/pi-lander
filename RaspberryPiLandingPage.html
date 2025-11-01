@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pi Launcher</title>
+  <meta name="color-scheme" content="dark light">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #121820;
+      --card-hover: #1a2230;
+      --text: #e6edf3;
+      --muted: #9fb0c3;
+      --accent-spotify: #1db954;
+      --accent-proton: #6c8cff;
+      --radius: 24px;
+      --gap: clamp(16px, 3vw, 28px);
+      --tile-size: min(36vmin, 420px);
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
+      background: radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
+                  radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
+                  var(--bg);
+      color: var(--text);
+      display: grid;
+      place-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--gap);
+      width: min(95vw, 960px);
+      justify-items: center;
+    }
+
+    .tile {
+      width: var(--tile-size);
+      height: var(--tile-size);
+      display: grid;
+      grid-template-rows: 1fr auto;
+      align-items: center;
+      justify-items: center;
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      text-decoration: none;
+      color: var(--text);
+      transition: transform .25s ease, background .25s ease;
+      cursor: pointer;
+    }
+
+    .tile:hover {
+      background: var(--card-hover);
+      transform: translateY(-4px);
+    }
+
+    .icon {
+      width: 52%;
+      aspect-ratio: 1/1;
+    }
+
+    .label {
+      font-weight: 700;
+      font-size: clamp(18px, 2.6vmin, 26px);
+      padding-bottom: 18px;
+    }
+
+    .spotify svg { fill: var(--accent-spotify); }
+    .proton svg { fill: var(--accent-proton); }
+  </style>
+  <style>
+    .quote {
+      width: min(95vw, 960px);
+      margin: 20px auto 8px auto;
+      text-align: center;
+      color: var(--text);
+      opacity: .92;
+      line-height: 1.35;
+    }
+    .quote .line { font-size: clamp(18px, 2.8vmin, 28px); font-weight: 700; }
+    .quote .author { font-size: clamp(14px, 2vmin, 18px); color: var(--muted); margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <main class="wrap" id="launcher">
+	<a class="quote" aria-live="polite" aria-atomic="true">
+		<div class="line" id="q-line">Loading something inspiring…</div>
+		<div class="author" id="q-author"></div>
+	</a>
+  </main>
+  <main class="wrap" id="launcher">
+    <a class="tile spotify" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">
+      <div class="icon">
+        <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44"/></svg>
+      </div>
+      <div class="label">Spotify</div>
+    </a>
+
+    <a class="tile proton" href="https://calendar.proton.me" target="_blank" rel="noopener noreferrer">
+      <div class="icon">
+        <svg viewBox="0 0 100 100"><rect x="20" y="20" width="60" height="60" rx="10"/></svg>
+      </div>
+      <div class="label">Calendar</div>
+    </a>
+  </main>
+
+  <script>
+    document.addEventListener('keydown', (e) => {
+      if (e.key.toLowerCase() === 's') window.open('https://open.spotify.com/', '_blank');
+      if (e.key.toLowerCase() === 'c') window.open('https://calendar.proton.me', '_blank');
+      if (e.key.toLowerCase() === 'f') toggleFullscreen();
+    });
+
+    function toggleFullscreen(){
+      const el = document.documentElement;
+      if (!document.fullscreenElement) el.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+      function toggleFullscreen(){
+      const el = document.documentElement;
+      if (!document.fullscreenElement) el.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    }
+
+    // ---- Daily Motivational Quote (from quotable.io) ----
+    const QUOTE_KEY = 'kiosk.daily.quote';
+    const qLine = document.getElementById('q-line');
+    const qAuthor = document.getElementById('q-author');
+
+    const FALLBACK_QUOTES = [
+      { c: 'Small steps, every day.', a: 'Unknown' },
+      { c: 'Discipline beats motivation.', a: 'Unknown' },
+      { c: 'Focus on the next right thing.', a: 'Unknown' },
+      { c: 'Ship it, then improve it.', a: 'Unknown' },
+      { c: 'Consistency compounds.', a: 'Unknown' },
+      { c: 'Make it work. Make it right. Make it fast.', a: 'Kent Beck' },
+      { c: 'Action cures fear.', a: 'David J. Schwartz' },
+      { c: 'The only way out is through.', a: 'Robert Frost' },
+    ];
+
+    function todayKey(){
+      return new Date().toISOString().slice(0,10);
+    }
+
+    async function fetchQuote(){
+      try {
+        const r = await fetch('https://api.quotable.io/random');
+        if (!r.ok) throw new Error('Bad status');
+        const j = await r.json();
+        return { c: j.content, a: j.author || 'Unknown' };
+      } catch (e) {
+        // fallback to a local quote if offline or API fails
+        return FALLBACK_QUOTES[Math.floor(Math.random()*FALLBACK_QUOTES.length)];
+      }
+    }
+
+    async function ensureQuote(){
+      const key = todayKey();
+      try {
+        const saved = JSON.parse(localStorage.getItem(QUOTE_KEY) || 'null');
+        if (saved && saved.date === key && saved.q){
+          renderQuote(saved.q);
+          return;
+        }
+      } catch {}
+      const q = await fetchQuote();
+      renderQuote(q);
+      try { localStorage.setItem(QUOTE_KEY, JSON.stringify({ date: key, q })); } catch {}
+    }
+
+    function renderQuote(q){
+      qLine.textContent = `“${q.c}”`;
+      qAuthor.textContent = q.a ? `— ${q.a}` : '';
+    }
+
+    // refresh quote at midnight
+    function scheduleMidnightRefresh(){
+      const now = new Date();
+      const midnight = new Date(now);
+      midnight.setHours(24,0,0,0);
+      setTimeout(() => { localStorage.removeItem(QUOTE_KEY); ensureQuote(); scheduleMidnightRefresh(); }, midnight-now);
+    }
+
+    ensureQuote();
+    scheduleMidnightRefresh();
+  </script>
+</body>
+</html>
+</body>
+</html>
