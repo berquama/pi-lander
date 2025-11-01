@@ -102,6 +102,24 @@
     }
     .quote .line { font-size: clamp(18px, 2.8vmin, 28px); font-weight: 700; }
     .quote .author { font-size: clamp(14px, 2vmin, 18px); color: var(--muted); margin-top: 6px; }
+	#backButton {
+	    position: fixed;
+	    top: 16px;
+	    left: 16px;
+	    background: rgba(0,0,0,0.5);
+	    color: #fff;
+	    border: 1px solid rgba(255,255,255,0.2);
+	    border-radius: 10px;
+	    padding: 10px 18px;
+	    font-weight: 600;
+	    cursor: pointer;
+	    z-index: 9999;
+	    display: none;
+	    backdrop-filter: blur(6px);
+	  }
+	  #backButton:hover {
+	    background: rgba(255,255,255,0.15);
+	  }
   </style>
 </head>
 <body>
@@ -129,7 +147,7 @@
       <div class="label">Calendar</div>
     </a>
   </main>
-
+  <button id="backButton" onclick="goHome()">← Back</button>
   <script>
     document.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 's') window.open('https://open.spotify.com/', '_blank');
@@ -209,11 +227,29 @@
 
     ensureQuote();
     scheduleMidnightRefresh();
+
+	const homeURL = window.location.origin + window.location.pathname;
+
+  // Detect if we are not on the home launcher page
+  function checkIfAway() {
+    const isHome = location.href === homeURL || location.hash === '#home';
+    document.getElementById('backButton').style.display = isHome ? 'none' : 'block';
+  }
+
+  // Go back to launcher
+  function goHome() {
+    window.location.href = homeURL + '#home';
+    location.reload();
+  }
+
+  // Watch for navigation changes
+  setInterval(checkIfAway, 1000);
   </script>
 </body>
 </html>
 </body>
 </html>
+
 
 
 
