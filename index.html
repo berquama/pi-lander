@@ -19,25 +19,55 @@
       --tile-size: min(36vmin, 420px);
     }
 
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       background: radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
                   radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
                   var(--bg);
       color: var(--text);
-      display: grid;
-      place-items: center;
-      height: 100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
       overflow: hidden;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      max-width: 90vw;
+    }
+
+    header h1 {
+      font-size: clamp(24px, 4vmin, 36px);
+      margin: 0 0 10px;
+    }
+
+    header .quote {
+      font-size: clamp(16px, 2vmin, 22px);
+      font-style: italic;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    header .author {
+      font-size: clamp(14px, 1.8vmin, 18px);
+      color: var(--muted);
+      margin-top: 6px;
     }
 
     .wrap {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: var(--gap);
-      width: min(95vw, 960px);
       justify-items: center;
+      width: min(95vw, 960px);
+      z-index: 2;
     }
 
     .tile {
@@ -56,15 +86,9 @@
       cursor: pointer;
     }
 
-    .tile:hover {
-      background: var(--card-hover);
-      transform: translateY(-4px);
-    }
+    .tile:hover { background: var(--card-hover); transform: translateY(-4px); }
 
-    .icon {
-      width: 52%;
-      aspect-ratio: 1/1;
-    }
+    .icon { width: 52%; aspect-ratio: 1/1; }
 
     .icon img {
       width: 80%;
@@ -75,23 +99,33 @@
       margin: auto;
     }
 
-    .label {
-      font-weight: 700;
-      font-size: clamp(18px, 2.6vmin, 26px);
-      padding-bottom: 18px;
-    }
+    .label { font-weight: 700; font-size: clamp(18px, 2.6vmin, 26px); padding-bottom: 18px; }
 
     .spotify img { filter: drop-shadow(0 0 12px var(--accent-spotify)); }
     .proton img { filter: drop-shadow(0 0 12px var(--accent-proton)); }
+
+    #iframeOverlay {
+      position: fixed;
+      inset: 0;
+      background: #000;
+      display: none;
+      z-index: 9998;
+    }
+
+    #iframeOverlay iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
 
     #backButton {
       position: fixed;
       top: 16px;
       left: 16px;
-      background: rgba(0,0,0,0.5);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 10px;
+      background: rgba(18,24,32,0.7);
+      color: #e6edf3;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 12px;
       padding: 10px 18px;
       font-weight: 600;
       cursor: pointer;
@@ -101,39 +135,67 @@
       transition: background 0.2s ease;
     }
 
-    #backButton:hover { background: rgba(255,255,255,0.15); }
+    #backButton:hover { background: rgba(30,40,50,0.8); }
   </style>
 </head>
 <body>
+  <header>
+    <h1>Hey Austin!</h1>
+    <p class="quote" id="q-line">Loading something inspiring…</p>
+    <p class="author" id="q-author"></p>
+  </header>
+
   <main class="wrap" id="launcher">
-    <a class="tile spotify" href="https://open.spotify.com/" target="_self">
+    <div class="tile spotify" onclick="openApp('https://open.spotify.com/')">
       <div class="icon"><img src="spotify.png" alt="Spotify Logo" /></div>
       <div class="label">Spotify</div>
-    </a>
+    </div>
 
-    <a class="tile proton" href="https://calendar.proton.me" target="_self">
+    <div class="tile proton" onclick="openApp('https://calendar.proton.me')">
       <div class="icon"><img src="proton.png" alt="Proton Calendar Logo" /></div>
       <div class="label">Proton Calendar</div>
-    </a>
+    </div>
   </main>
 
-  <button id="backButton" onclick="goHome()">← Back</button>
+  <div id="iframeOverlay"><iframe id="appFrame" src=""></iframe></div>
+  <button id="backButton" onclick="closeApp()">← Back</button>
 
   <script>
-    // Back button logic
-    const homeURL = window.location.origin + window.location.pathname;
-
-    function checkIfAway() {
-      const isHome = location.href === homeURL || location.hash === '#home';
-      document.getElementById('backButton').style.display = isHome ? 'none' : 'block';
+    // Launch app in iframe overlay
+    function openApp(url) {
+      const iframeOverlay = document.getElementById('iframeOverlay');
+      const frame = document.getElementById('appFrame');
+      frame.src = url;
+      iframeOverlay.style.display = 'block';
+      document.getElementById('backButton').style.display = 'block';
     }
 
-    function goHome() {
-      window.location.href = homeURL + '#home';
-      location.reload();
+    function closeApp() {
+      const iframeOverlay = document.getElementById('iframeOverlay');
+      const frame = document.getElementById('appFrame');
+      frame.src = '';
+      iframeOverlay.style.display = 'none';
+      document.getElementById('backButton').style.display = 'none';
     }
 
-    setInterval(checkIfAway, 1000);
+    // Daily motivational quote
+    const qLine = document.getElementById('q-line');
+    const qAuthor = document.getElementById('q-author');
+
+    async function fetchQuote(){
+      try {
+        const r = await fetch('https://api.quotable.io/random');
+        if (!r.ok) throw new Error('Bad status');
+        const j = await r.json();
+        qLine.textContent = '“' + j.content + '”';
+        qAuthor.textContent = '— ' + j.author;
+      } catch(e) {
+        qLine.textContent = '“Small steps, every day.”';
+        qAuthor.textContent = '— Unknown';
+      }
+    }
+
+    fetchQuote();
   </script>
 </body>
 </html>
