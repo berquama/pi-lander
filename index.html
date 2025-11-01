@@ -4,7 +4,6 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Pi Launcher</title>
-  <link rel="icon" type="image/png" href="favicon.png">
   <meta name="color-scheme" content="dark light">
   <style>
     :root {
@@ -66,21 +65,15 @@
       width: 52%;
       aspect-ratio: 1/1;
     }
-    .icon img {
-	  height: auto;
-	  max-height: 80%;
-	  object-fit: contain;
-	  display: block;
-	  margin: auto;
-	  image-rendering: crisp-edges; 
-	}
-    .spotify img {
-	  width: 90%;
-	}
 
-	.proton img {
-	  width: 80%;
-	}
+    .icon img {
+      width: 80%;
+      height: auto;
+      max-height: 80%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+    }
 
     .label {
       font-weight: 700;
@@ -88,170 +81,59 @@
       padding-bottom: 18px;
     }
 
-    .spotify svg { fill: var(--accent-spotify); }
-    .proton svg { fill: var(--accent-proton); }
-  </style>
-  <style>
-    .quote {
-      width: min(95vw, 960px);
-      margin: 20px auto 8px auto;
-      text-align: center;
-      color: var(--text);
-      opacity: .92;
-      line-height: 1.35;
+    .spotify img { filter: drop-shadow(0 0 12px var(--accent-spotify)); }
+    .proton img { filter: drop-shadow(0 0 12px var(--accent-proton)); }
+
+    #backButton {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 9999;
+      display: none;
+      backdrop-filter: blur(6px);
+      transition: background 0.2s ease;
     }
-    .quote .line { font-size: clamp(18px, 2.8vmin, 28px); font-weight: 700; }
-    .quote .author { font-size: clamp(14px, 2vmin, 18px); color: var(--muted); margin-top: 6px; }
-	#backButton {
-	    position: fixed;
-	    top: 16px;
-	    left: 16px;
-	    background: rgba(0,0,0,0.5);
-	    color: #fff;
-	    border: 1px solid rgba(255,255,255,0.2);
-	    border-radius: 10px;
-	    padding: 10px 18px;
-	    font-weight: 600;
-	    cursor: pointer;
-	    z-index: 9999;
-	    display: none;
-	    backdrop-filter: blur(6px);
-	  }
-	  #backButton:hover {
-	    background: rgba(255,255,255,0.15);
-	  }
+
+    #backButton:hover { background: rgba(255,255,255,0.15); }
   </style>
 </head>
 <body>
-	<header>
-		<h1>Hello Austin!</h2>
-	</header>
   <main class="wrap" id="launcher">
-	<a class="quote" aria-live="polite" aria-atomic="true">
-		<div class="line" id="q-line">Loading something inspiring…</div>
-		<div class="author" id="q-author"></div>
-	</a>
-  </main>
-  <main class="wrap" id="launcher">
-    <a class="tile spotify" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">
-      <div class="icon">
-  		<img src="spotify.png" alt="Spotify Logo" />
-	  </div>
+    <a class="tile spotify" href="https://open.spotify.com/" target="_self">
+      <div class="icon"><img src="spotify.png" alt="Spotify Logo" /></div>
       <div class="label">Spotify</div>
     </a>
 
-    <a class="tile proton" href="https://calendar.proton.me" target="_blank" rel="noopener noreferrer">
-      <div class="icon">
-  		<img src="proton.png" alt="Proton Calendar Logo" />
-	</div>
-      <div class="label">Calendar</div>
+    <a class="tile proton" href="https://calendar.proton.me" target="_self">
+      <div class="icon"><img src="proton.png" alt="Proton Calendar Logo" /></div>
+      <div class="label">Proton Calendar</div>
     </a>
   </main>
+
   <button id="backButton" onclick="goHome()">← Back</button>
+
   <script>
-    document.addEventListener('keydown', (e) => {
-      if (e.key.toLowerCase() === 's') window.open('https://open.spotify.com/', '_blank');
-      if (e.key.toLowerCase() === 'c') window.open('https://calendar.proton.me', '_blank');
-      if (e.key.toLowerCase() === 'f') toggleFullscreen();
-    });
+    // Back button logic
+    const homeURL = window.location.origin + window.location.pathname;
 
-    function toggleFullscreen(){
-      const el = document.documentElement;
-      if (!document.fullscreenElement) el.requestFullscreen?.();
-      else document.exitFullscreen?.();
-    }
-      function toggleFullscreen(){
-      const el = document.documentElement;
-      if (!document.fullscreenElement) el.requestFullscreen?.();
-      else document.exitFullscreen?.();
+    function checkIfAway() {
+      const isHome = location.href === homeURL || location.hash === '#home';
+      document.getElementById('backButton').style.display = isHome ? 'none' : 'block';
     }
 
-    // ---- Daily Motivational Quote (from quotable.io) ----
-    const QUOTE_KEY = 'kiosk.daily.quote';
-    const qLine = document.getElementById('q-line');
-    const qAuthor = document.getElementById('q-author');
-
-    const FALLBACK_QUOTES = [
-      { c: 'Small steps, every day.', a: 'Unknown' },
-      { c: 'Discipline beats motivation.', a: 'Unknown' },
-      { c: 'Focus on the next right thing.', a: 'Unknown' },
-      { c: 'Ship it, then improve it.', a: 'Unknown' },
-      { c: 'Consistency compounds.', a: 'Unknown' },
-      { c: 'Make it work. Make it right. Make it fast.', a: 'Kent Beck' },
-      { c: 'Action cures fear.', a: 'David J. Schwartz' },
-      { c: 'The only way out is through.', a: 'Robert Frost' },
-    ];
-
-    function todayKey(){
-      return new Date().toISOString().slice(0,10);
+    function goHome() {
+      window.location.href = homeURL + '#home';
+      location.reload();
     }
 
-    async function fetchQuote(){
-      try {
-        const r = await fetch('https://api.quotable.io/random');
-        if (!r.ok) throw new Error('Bad status');
-        const j = await r.json();
-        return { c: j.content, a: j.author || 'Unknown' };
-      } catch (e) {
-        // fallback to a local quote if offline or API fails
-        return FALLBACK_QUOTES[Math.floor(Math.random()*FALLBACK_QUOTES.length)];
-      }
-    }
-
-    async function ensureQuote(){
-      const key = todayKey();
-      try {
-        const saved = JSON.parse(localStorage.getItem(QUOTE_KEY) || 'null');
-        if (saved && saved.date === key && saved.q){
-          renderQuote(saved.q);
-          return;
-        }
-      } catch {}
-      const q = await fetchQuote();
-      renderQuote(q);
-      try { localStorage.setItem(QUOTE_KEY, JSON.stringify({ date: key, q })); } catch {}
-    }
-
-    function renderQuote(q){
-      qLine.textContent = `“${q.c}”`;
-      qAuthor.textContent = q.a ? `— ${q.a}` : '';
-    }
-
-    // refresh quote at midnight
-    function scheduleMidnightRefresh(){
-      const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24,0,0,0);
-      setTimeout(() => { localStorage.removeItem(QUOTE_KEY); ensureQuote(); scheduleMidnightRefresh(); }, midnight-now);
-    }
-
-    ensureQuote();
-    scheduleMidnightRefresh();
-
-	const homeURL = window.location.origin + window.location.pathname;
-
-  // Detect if we are not on the home launcher page
-  function checkIfAway() {
-    const isHome = location.href === homeURL || location.hash === '#home';
-    document.getElementById('backButton').style.display = isHome ? 'none' : 'block';
-  }
-
-  // Go back to launcher
-  function goHome() {
-    window.location.href = homeURL + '#home';
-    location.reload();
-  }
-
-  // Watch for navigation changes
-  setInterval(checkIfAway, 1000);
+    setInterval(checkIfAway, 1000);
   </script>
 </body>
 </html>
-</body>
-</html>
-
-
-
-
-
-
