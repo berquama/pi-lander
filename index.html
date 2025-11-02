@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Pi Launcher</title>
-  <link rel="icon" type="image/png" href="favicon.png?v=1">
+  <title>Pi Dashboard</title>
   <meta name="color-scheme" content="dark light">
+  <link rel="icon" type="image/png" href="favicon.png?v=1">
   <style>
     :root {
       --bg: #0b0f14;
@@ -13,139 +13,223 @@
       --card-hover: #1a2230;
       --text: #e6edf3;
       --muted: #9fb0c3;
-      --accent-spotify: #1db954;
-      --accent-proton: #6c8cff;
-      --radius: 24px;
-      --gap: clamp(16px, 3vw, 28px);
-      --tile-size: min(36vmin, 420px);
+      --accent: #6c8cff;
+      --good: #1db954;
+      --gap: clamp(14px, 3vmin, 28px);
+      --radius: 22px;
+      --shadow: 0 12px 36px rgba(0,0,0,.35);
+      --maxw: min(1200px, 96vw);
     }
 
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
+    html, body { height: 100%; }
+    * { box-sizing: border-box; }
 
     body {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
-                  radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
-                  var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
-      overflow: hidden;
-    }
-
-    header {
-      text-align: center;
-      margin-bottom: 40px;
-      max-width: 90vw;
-    }
-
-    header h1 {
-      font-size: clamp(24px, 4vmin, 36px);
-      margin: 0 0 10px;
-    }
-
-    header .quote {
-      font-size: clamp(16px, 2vmin, 22px);
-      font-style: italic;
-      color: var(--muted);
       margin: 0;
-    }
-
-    header .author {
-      font-size: clamp(14px, 1.8vmin, 18px);
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .wrap {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: var(--gap);
-      justify-items: center;
-      width: min(95vw, 960px);
-      z-index: 2;
-    }
-
-    .tile {
-      width: var(--tile-size);
-      height: var(--tile-size);
-      display: grid;
-      grid-template-rows: 1fr auto;
-      align-items: center;
-      justify-items: center;
-      border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      text-decoration: none;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
       color: var(--text);
-      transition: transform .25s ease, background .25s ease;
-      cursor: pointer;
+      background:
+        radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
+        radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
+        var(--bg);
+      display: grid;
+      place-items: center;
+      padding: clamp(12px, 3vmin, 28px) 0;
     }
 
-    .tile:hover { background: var(--card-hover); transform: translateY(-4px); }
-
-    .icon { width: 52%; aspect-ratio: 1/1; }
-
-    .icon img {
-      width: 80%;
-      height: auto;
-      max-height: 80%;
-      object-fit: contain;
-      display: block;
-      margin: auto;
+    .grid {
+      width: var(--maxw);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 1fr;
+      gap: var(--gap);
+      align-items: stretch;
     }
 
-    .label { font-weight: 700; font-size: clamp(18px, 2.6vmin, 26px); padding-bottom: 18px; }
+    .widget {
+      background: linear-gradient(180deg, color-mix(in oklab, var(--card), #000 6%), var(--card));
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(14px, 2.6vmin, 24px);
+      min-height: 140px;
+      display: grid;
+      align-content: center;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+    }
 
-    .spotify img { filter: drop-shadow(0 0 12px var(--accent-spotify)); }
-    .proton img { filter: drop-shadow(0 0 12px var(--accent-proton)); }
+    .widget:hover { background: linear-gradient(180deg, var(--card-hover), var(--card)); }
+
+    .title { font: 700 clamp(14px, 2vmin, 18px)/1 var(--font, inherit); color: var(--muted); letter-spacing:.4px; margin-bottom: 8px; }
+
+    .clock { grid-column: span 6; }
+    .weather { grid-column: span 6; }
+    .spotify { grid-column: span 12; }
+    .quote { grid-column: span 12; }
+
+    @media (max-width: 900px) {
+      .clock, .weather { grid-column: span 12; }
+    }
+
+    .clock .time { font-weight: 800; font-size: clamp(42px, 9vmin, 86px); letter-spacing: 1px; }
+    .clock .date { margin-top: 6px; color: var(--muted); font-size: clamp(14px, 2.2vmin, 18px); }
+
+    .weather .row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
+    .weather .temp { font-weight: 800; font-size: clamp(28px, 6vmin, 48px); }
+    .weather .desc { color: var(--muted); text-transform: capitalize; }
+    .weather .loc { color: var(--muted); font-size: 14px; }
+    .weather img { width: clamp(56px, 10vmin, 96px); height: auto; image-rendering: -webkit-optimize-contrast; }
+
+    .spotify .np { display: grid; grid-template-columns: clamp(72px,12vmin,120px) 1fr auto; gap: 18px; align-items: center; }
+    .spotify .cover { width: 100%; border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,.35); }
+    .spotify .track { font-weight: 700; font-size: clamp(18px, 2.4vmin, 24px); }
+    .spotify .artist { color: var(--muted); margin-top: 4px; }
+    .spotify .status { color: var(--good); font-weight: 700; font-size: 14px; letter-spacing:.4px; }
+
+    .pill { position: absolute; top: 12px; right: 12px; padding: 6px 10px; font-weight: 700; font-size: 12px; color: #0b0f14; background: var(--accent); border-radius: 999px; }
+
+    .quote .line { font-weight: 800; font-size: clamp(18px, 3vmin, 28px); }
+    .quote .author { color: var(--muted); margin-top: 6px; }
+
+    body { opacity: 0; animation: fade 700ms ease forwards; }
+    @keyframes fade { to { opacity: 1; } }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Hey Austin!</h1>
-    <p class="quote" id="q-line">Loading something inspiring…</p>
-    <p class="author" id="q-author"></p>
-  </header>
+  <div class="grid">
+    <section class="widget clock">
+      <div class="title">Hey Austin!</div>
+      <div class="time" id="time">--:--</div>
+      <div class="date" id="date">Loading date…</div>
+    </section>
 
-  <main class="wrap" id="launcher">
-    <div class="tile spotify" onclick="openApp('https://open.spotify.com/')">
-      <div class="icon"><img src="spotify.png" alt="Spotify Logo" /></div>
-      <div class="label">Spotify</div>
-    </div>
+    <section class="widget weather">
+      <div class="title">Weather</div>
+      <div class="row">
+        <img id="wx-icon" alt="" src=""/>
+        <div>
+          <div class="temp"><span id="wx-temp">--</span>°</div>
+          <div class="desc" id="wx-desc">Loading…</div>
+          <div class="loc" id="wx-loc"></div>
+        </div>
+        <div>
+          <div class="pill" id="wx-pill">--%</div>
+        </div>
+      </div>
+    </section>
 
-    <div class="tile proton" onclick="openApp('https://calendar.proton.me')">
-      <div class="icon"><img src="proton.png" alt="Proton Calendar Logo" /></div>
-      <div class="label">Proton Calendar</div>
-    </div>
-  </main>
+    <section class="widget spotify">
+      <div class="title">Now Playing</div>
+      <div class="np" id="np">
+        <img class="cover" id="np-cover" alt="Album art" src="" />
+        <div>
+          <div class="track" id="np-track">—</div>
+          <div class="artist" id="np-artist"></div>
+        </div>
+        <div class="status" id="np-status">Idle</div>
+      </div>
+    </section>
+
+    <section class="widget quote">
+      <div class="title">Daily Motivation</div>
+      <div class="line" id="q-line">Loading something inspiring…</div>
+      <div class="author" id="q-author"></div>
+    </section>
+  </div>
 
   <script>
-    // Open app in new window
-    let appWindow = null;
+    const WEATHER = {
+      apiKey: 'b7396f9258b91bb617e7cf81cbd1eed4',
+      city: 'Denver,US',
+      units: 'imperial'
+    };
 
-    function openApp(url) {
-      if (appWindow && !appWindow.closed) {
-        appWindow.focus();
-        appWindow.location.href = url;
-      } else {
-        appWindow = window.open(url, '_blank');
+    const LASTFM = {
+      apiKey: '9c086b2b9bad7436918e93fb4333141d',
+      username: 'berquama'
+    };
+
+    const timeEl = document.getElementById('time');
+    const dateEl = document.getElementById('date');
+
+    function pad(n){ return n.toString().padStart(2,'0'); }
+    function tick(){
+      const now = new Date();
+      let h = now.getHours();
+      const m = pad(now.getMinutes());
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12 = ((h + 11) % 12) + 1;
+      timeEl.textContent = `${h12}:${m} ${ampm}`;
+      dateEl.textContent = now.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    tick(); setInterval(tick, 1000);
+
+    async function loadWeather(){
+      const u = new URL('https://api.openweathermap.org/data/2.5/weather');
+      u.search = new URLSearchParams({ q: WEATHER.city, appid: WEATHER.apiKey, units: WEATHER.units }).toString();
+      try {
+        const r = await fetch(u);
+        const j = await r.json();
+        const temp = Math.round(j.main.temp);
+        const desc = j.weather?.[0]?.description || '—';
+        const icon = j.weather?.[0]?.icon || '01d';
+        const humidity = j.main.humidity;
+        const loc = `${j.name}${j.sys?.country ? ', ' + j.sys.country : ''}`;
+        document.getElementById('wx-temp').textContent = temp;
+        document.getElementById('wx-desc').textContent = desc;
+        document.getElementById('wx-loc').textContent = loc;
+        document.getElementById('wx-pill').textContent = humidity + '%';
+        document.getElementById('wx-icon').src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+        document.getElementById('wx-icon').alt = desc;
+      } catch(e){
+        document.getElementById('wx-temp').textContent = '--';
+        document.getElementById('wx-desc').textContent = 'Error loading weather';
       }
     }
 
-    // Daily motivational quote
+    loadWeather();
+
+    async function loadNowPlaying(){
+      const { apiKey, username } = LASTFM;
+      const trackEl = document.getElementById('np-track');
+      const artistEl = document.getElementById('np-artist');
+      const statusEl = document.getElementById('np-status');
+      const coverEl = document.getElementById('np-cover');
+      const u = new URL('https://ws.audioscrobbler.com/2.0/');
+      u.search = new URLSearchParams({
+        method: 'user.getrecenttracks',
+        user: username,
+        api_key: apiKey,
+        format: 'json',
+        limit: 1
+      }).toString();
+      try {
+        const r = await fetch(u);
+        const j = await r.json();
+        const t = j.recenttracks?.track?.[0];
+        const isNow = t['@attr']?.nowplaying === 'true';
+        trackEl.textContent = t.name || '—';
+        artistEl.textContent = t.artist?.['#text'] || '';
+        statusEl.textContent = isNow ? 'Now Playing' : 'Last Played';
+        const img = (t.image||[]).slice(-1)[0]?.['#text'] || '';
+        coverEl.src = img || '';
+      } catch(e){
+        trackEl.textContent = '—';
+        artistEl.textContent = 'Unable to fetch now playing';
+        statusEl.textContent = 'Offline';
+      }
+    }
+
+    loadNowPlaying();
+    setInterval(loadNowPlaying, 30000);
+
     const qLine = document.getElementById('q-line');
     const qAuthor = document.getElementById('q-author');
 
     async function fetchQuote(){
       try {
         const r = await fetch('https://api.quotable.io/random');
-        if (!r.ok) throw new Error('Bad status');
         const j = await r.json();
         qLine.textContent = '“' + j.content + '”';
         qAuthor.textContent = '— ' + j.author;
@@ -159,4 +243,3 @@
   </script>
 </body>
 </html>
-
