@@ -18,124 +18,114 @@
       --gap: clamp(14px, 3vmin, 28px);
       --radius: 22px;
       --shadow: 0 12px 36px rgba(0,0,0,.35);
-      --maxw: min(1200px, 96vw);
+      --maxw: min(1400px, 96vw);
     }
 
-    html, body { height: 100%; }
+    html, body { height: 100%; margin: 0; }
     * { box-sizing: border-box; }
 
     body {
-      margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans;
       color: var(--text);
-      background:
-        radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
-        radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
-        var(--bg);
-      display: grid;
-      place-items: center;
-      padding: clamp(12px, 3vmin, 28px) 0;
+      background: radial-gradient(1200px 800px at 20% 10%, #101826 0%, var(--bg) 40%) no-repeat,
+                  radial-gradient(900px 600px at 80% 90%, #0d1320 0%, var(--bg) 40%) no-repeat,
+                  var(--bg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(12px, 3vmin, 28px);
+    }
+
+    .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: var(--maxw);
+      gap: var(--gap);
+    }
+
+    .avatar {
+      flex: 0 0 250px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .avatar img {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 40px rgba(0,0,0,.4);
     }
 
     .grid {
-      width: var(--maxw);
+      flex: 1;
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-auto-rows: 1fr;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
       gap: var(--gap);
-      align-items: stretch;
     }
 
     .widget {
-      background: linear-gradient(180deg, color-mix(in oklab, var(--card), #000 6%), var(--card));
+      background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       padding: clamp(14px, 2.6vmin, 24px);
-      min-height: 140px;
       display: grid;
       align-content: center;
       position: relative;
-      overflow: hidden;
-      isolation: isolate;
     }
 
-    .widget:hover { background: linear-gradient(180deg, var(--card-hover), var(--card)); }
+    .title { font-weight: 700; color: var(--muted); margin-bottom: 8px; }
+    .clock .time { font-weight: 800; font-size: clamp(42px, 9vmin, 86px); }
+    .clock .date { color: var(--muted); font-size: clamp(14px, 2.2vmin, 18px); }
 
-    .title { font: 700 clamp(14px, 2vmin, 18px)/1 var(--font, inherit); color: var(--muted); letter-spacing:.4px; margin-bottom: 8px; }
-
-    .clock { grid-column: span 6; }
-    .weather { grid-column: span 6; }
-    .spotify { grid-column: span 12; }
-    .quote { grid-column: span 12; }
-
-    @media (max-width: 900px) {
-      .clock, .weather { grid-column: span 12; }
-    }
-
-    .clock .time { font-weight: 800; font-size: clamp(42px, 9vmin, 86px); letter-spacing: 1px; }
-    .clock .date { margin-top: 6px; color: var(--muted); font-size: clamp(14px, 2.2vmin, 18px); }
-
-    .weather .row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; }
     .weather .temp { font-weight: 800; font-size: clamp(28px, 6vmin, 48px); }
     .weather .desc { color: var(--muted); text-transform: capitalize; }
-    .weather .loc { color: var(--muted); font-size: 14px; }
-    .weather img { width: clamp(56px, 10vmin, 96px); height: auto; image-rendering: -webkit-optimize-contrast; }
+    .weather img { width: clamp(56px, 10vmin, 96px); }
 
-    .spotify .np { display: grid; grid-template-columns: clamp(72px,12vmin,120px) 1fr auto; gap: 18px; align-items: center; }
-    .spotify .cover { width: 100%; border-radius: 12px; box-shadow: 0 10px 24px rgba(0,0,0,.35); }
     .spotify .track { font-weight: 700; font-size: clamp(18px, 2.4vmin, 24px); }
     .spotify .artist { color: var(--muted); margin-top: 4px; }
-    .spotify .status { color: var(--good); font-weight: 700; font-size: 14px; letter-spacing:.4px; }
-
-    .pill { position: absolute; top: 12px; right: 12px; padding: 6px 10px; font-weight: 700; font-size: 12px; color: #0b0f14; background: var(--accent); border-radius: 999px; }
+    .spotify .status { color: var(--good); font-weight: 700; font-size: 14px; }
 
     .quote .line { font-weight: 800; font-size: clamp(18px, 3vmin, 28px); }
     .quote .author { color: var(--muted); margin-top: 6px; }
-
-    body { opacity: 0; animation: fade 700ms ease forwards; }
-    @keyframes fade { to { opacity: 1; } }
   </style>
 </head>
 <body>
-  <div class="grid">
-    <section class="widget clock">
-      <div class="title">Hey Austin!</div>
-      <div class="time" id="time">--:--</div>
-      <div class="date" id="date">Loading date…</div>
-    </section>
+  <div class="container">
+    <div class="avatar">
+      <img src="favicon.png" alt="Avatar Icon" />
+    </div>
+    <div class="grid">
+      <section class="widget clock">
+        <div class="title">Hey Austin!</div>
+        <div class="time" id="time">--:--</div>
+        <div class="date" id="date">Loading date…</div>
+      </section>
 
-    <section class="widget weather">
-      <div class="title">Weather</div>
-      <div class="row">
+      <section class="widget weather">
+        <div class="title">Weather</div>
         <img id="wx-icon" alt="" src=""/>
-        <div>
-          <div class="temp"><span id="wx-temp">--</span>°</div>
-          <div class="desc" id="wx-desc">Loading…</div>
-          <div class="loc" id="wx-loc"></div>
-        </div>
-        <div>
-          <div class="pill" id="wx-pill">--%</div>
-        </div>
-      </div>
-    </section>
+        <div class="temp"><span id="wx-temp">--</span>°</div>
+        <div class="desc" id="wx-desc">Loading…</div>
+        <div class="loc" id="wx-loc"></div>
+      </section>
 
-    <section class="widget spotify">
-      <div class="title">Now Playing</div>
-      <div class="np" id="np">
-        <img class="cover" id="np-cover" alt="Album art" src="" />
-        <div>
-          <div class="track" id="np-track">—</div>
-          <div class="artist" id="np-artist"></div>
-        </div>
+      <section class="widget spotify">
+        <div class="title">Now Playing</div>
+        <div class="track" id="np-track">—</div>
+        <div class="artist" id="np-artist"></div>
         <div class="status" id="np-status">Idle</div>
-      </div>
-    </section>
+      </section>
 
-    <section class="widget quote">
-      <div class="title">Daily Motivation</div>
-      <div class="line" id="q-line">Loading something inspiring…</div>
-      <div class="author" id="q-author"></div>
-    </section>
+      <section class="widget quote">
+        <div class="title">Daily Motivation</div>
+        <div class="line" id="q-line">Loading something inspiring…</div>
+        <div class="author" id="q-author"></div>
+      </section>
+    </div>
   </div>
 
   <script>
@@ -174,14 +164,11 @@
         const temp = Math.round(j.main.temp);
         const desc = j.weather?.[0]?.description || '—';
         const icon = j.weather?.[0]?.icon || '01d';
-        const humidity = j.main.humidity;
         const loc = `${j.name}${j.sys?.country ? ', ' + j.sys.country : ''}`;
         document.getElementById('wx-temp').textContent = temp;
         document.getElementById('wx-desc').textContent = desc;
         document.getElementById('wx-loc').textContent = loc;
-        document.getElementById('wx-pill').textContent = humidity + '%';
         document.getElementById('wx-icon').src = `https://openweathermap.org/img/wn/${icon}@2x.png`;
-        document.getElementById('wx-icon').alt = desc;
       } catch(e){
         document.getElementById('wx-temp').textContent = '--';
         document.getElementById('wx-desc').textContent = 'Error loading weather';
@@ -195,7 +182,6 @@
       const trackEl = document.getElementById('np-track');
       const artistEl = document.getElementById('np-artist');
       const statusEl = document.getElementById('np-status');
-      const coverEl = document.getElementById('np-cover');
       const u = new URL('https://ws.audioscrobbler.com/2.0/');
       u.search = new URLSearchParams({
         method: 'user.getrecenttracks',
@@ -212,8 +198,6 @@
         trackEl.textContent = t.name || '—';
         artistEl.textContent = t.artist?.['#text'] || '';
         statusEl.textContent = isNow ? 'Now Playing' : 'Last Played';
-        const img = (t.image||[]).slice(-1)[0]?.['#text'] || '';
-        coverEl.src = img || '';
       } catch(e){
         trackEl.textContent = '—';
         artistEl.textContent = 'Unable to fetch now playing';
@@ -224,10 +208,9 @@
     loadNowPlaying();
     setInterval(loadNowPlaying, 30000);
 
-    const qLine = document.getElementById('q-line');
-    const qAuthor = document.getElementById('q-author');
-
     async function fetchQuote(){
+      const qLine = document.getElementById('q-line');
+      const qAuthor = document.getElementById('q-author');
       try {
         const r = await fetch('https://api.quotable.io/random');
         const j = await r.json();
