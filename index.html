@@ -66,8 +66,6 @@
       grid-template-columns: repeat(2, 1fr);
       grid-template-rows: repeat(2, 1fr);
       gap: var(--gap);
-      align-items: center;
-      justify-items: center;
       padding-block: 20px;
     }
 
@@ -75,29 +73,72 @@
       background: var(--card);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      padding: clamp(14px, 2.6vmin, 24px);
+      padding: clamp(20px, 3vmin, 32px);
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       text-align: center;
-      min-height: 200px;
+      min-height: 280px;
+      width: 100%;
+      transition: background 0.3s ease;
     }
 
-    .title { font-weight: 700; color: var(--muted); margin-bottom: 8px; }
-    .clock .time { font-weight: 800; font-size: clamp(42px, 9vmin, 86px); }
-    .clock .date { color: var(--muted); font-size: clamp(14px, 2.2vmin, 18px); }
+    .widget:hover {
+      background: var(--card-hover);
+    }
 
-    .weather .temp { font-weight: 800; font-size: clamp(28px, 6vmin, 48px); }
-    .weather .desc { color: var(--muted); text-transform: capitalize; }
-    .weather img { width: clamp(56px, 10vmin, 96px); }
+    .title {
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
 
-    .spotify .track { font-weight: 700; font-size: clamp(18px, 2.4vmin, 24px); }
-    .spotify .artist { color: var(--muted); margin-top: 4px; }
-    .spotify .status { color: var(--good); font-weight: 700; font-size: 14px; }
+    .clock .time {
+      font-weight: 800;
+      font-size: clamp(42px, 9vmin, 86px);
+    }
+    .clock .date {
+      color: var(--muted);
+      font-size: clamp(14px, 2.2vmin, 18px);
+    }
 
-    .quote .line { font-weight: 800; font-size: clamp(18px, 3vmin, 28px); }
-    .quote .author { color: var(--muted); margin-top: 6px; }
+    .weather .temp {
+      font-weight: 800;
+      font-size: clamp(28px, 6vmin, 48px);
+    }
+    .weather .desc {
+      color: var(--muted);
+      text-transform: capitalize;
+    }
+    .weather img {
+      width: clamp(56px, 10vmin, 96px);
+      margin-bottom: 8px;
+    }
+
+    .spotify .track {
+      font-weight: 700;
+      font-size: clamp(18px, 2.4vmin, 24px);
+    }
+    .spotify .artist {
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .spotify .status {
+      color: var(--good);
+      font-weight: 700;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .quote .line {
+      font-weight: 800;
+      font-size: clamp(18px, 3vmin, 28px);
+    }
+    .quote .author {
+      color: var(--muted);
+      margin-top: 6px;
+    }
   </style>
 </head>
 <body>
@@ -105,6 +146,7 @@
     <div class="avatar">
       <img src="favicon.png" alt="Avatar Icon" />
     </div>
+
     <div class="grid">
       <section class="widget clock">
         <div class="title">Hey Austin!</div>
